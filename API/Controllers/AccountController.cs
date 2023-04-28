@@ -1,7 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using API.Data;
-using API.DTOs;
+using API.Entities.Requests;
+using API.Entities.Responses;
 using API.Entities;
 using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
+    // TODO: Adds fluent validations
     public class AccountsController : BaseApiController
     {
         private readonly ILogger<AccountsController> logger;
@@ -26,7 +28,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register(RegisterDto register)
+        public async Task<ActionResult<UserResponse>> Register(RegisterRequest register)
         {
             this.logger.LogInformation($"Validating username provided: '{register.Username}'.");
 
@@ -47,17 +49,17 @@ namespace API.Controllers
             await this.context.SaveChangesAsync();
             this.logger.LogInformation($"User '{user.Username}' has been created.");
 
-            var userDto = new UserDto 
-            { 
-                Username = user.Username,
-                Token = this.tokenService.CreateToken(user),
-            };
+            var userDto = new UserResponse 
+            (
+                user.Username,
+                this.tokenService.CreateToken(user)
+            );
 
             return Ok(userDto);
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login(LoginDto login)
+        public async Task<ActionResult<UserResponse>> Login(LoginRequest login)
         {
             this.logger.LogInformation($"Looking for provided username: '{login.Username}'.");
             var user = await this.context.Users.SingleOrDefaultAsync(x => x.Username == login.Username);
@@ -82,11 +84,11 @@ namespace API.Controllers
 
             this.logger.LogInformation($"Credentials for user '{user.Username}' has been validated.");
             
-            var userDto = new UserDto 
-            { 
-                Username = user.Username,
-                Token = this.tokenService.CreateToken(user),
-            };
+            var userDto = new UserResponse 
+            (
+                user.Username,
+                this.tokenService.CreateToken(user)
+            );
 
             return Ok(userDto);
         }

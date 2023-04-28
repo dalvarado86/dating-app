@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    [Authorize]
+    // TODO: Adds fluent validations
     public class UsersController : BaseApiController
     {
         private readonly DataContext context;
