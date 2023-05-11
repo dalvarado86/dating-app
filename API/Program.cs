@@ -1,4 +1,5 @@
 using API.Extensions;
+using API.Middlewares;
 
 const string ClientAppOrigin = "http://localhost:4200";
 
@@ -15,6 +16,8 @@ builder.Services
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors(builder => builder
     .AllowAnyHeader()
     .AllowAnyMethod()
