@@ -1,46 +1,45 @@
-using API.Data;
-using API.Entities;
+using API.Entities.DTOs;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    // TODO: Adds fluent validations
+    [Authorize]
     public class UsersController : BaseApiController
     {
-        private readonly DataContext context;
+        private readonly IUserRepository repository;
         private readonly ILogger<UsersController> logger;
         
-        public UsersController(DataContext context, ILogger<UsersController> logger)
+        public UsersController(IUserRepository repository, ILogger<UsersController> logger)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
         {
             this.logger.LogInformation("Fetching all users.");
-            var users = await this.context.Users.ToListAsync();
-            this.logger.LogInformation($"{users.Count} Users have been retrieved.");
-            return Ok(users);
+            var members = await this.repository.GetMembersAsync();
+            this.logger.LogInformation($"{members.Count()} Users have been retrieved.");
+            return Ok(members);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AppUser>> GetUsers(int id)
+        [HttpGet("{username}")]
+        public async Task<ActionResult<MemberDto>> GetUserbyName(string username)
         {
-            this.logger.LogInformation($"Looking for user with id {id}.");
-            var user = await this.context.Users.FindAsync(id);
+            this.logger.LogInformation($"Looking for user with username: {username}.");
+            var member = await this.repository.GetMemberByUsernameAsync(username);
             
-            if (user is null)
+            if (member is null)
             {
-                 this.logger.LogInformation($"User with id {id} does not exist.");
+                 this.logger.LogInformation($"User with username {username} does not exist.");
                 return NotFound();
             }
 
-            this.logger.LogInformation($"User has been retrieved: id: {user.Id}, username: {user.Username}.");
-            return Ok(user);
+            this.logger.LogInformation($"User has been retrieved: username: {member.Username}.");
+            return Ok(member);
         }
     }
 }
