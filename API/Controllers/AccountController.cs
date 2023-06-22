@@ -51,8 +51,9 @@ namespace API.Controllers
 
             var userDto = new UserResponse 
             (
-                user.Username,
-                this.tokenService.CreateToken(user)
+                Username: user.Username,
+                Token: this.tokenService.CreateToken(user),
+                PhotoUrl: string.Empty
             );
 
             return Ok(userDto);
@@ -62,7 +63,10 @@ namespace API.Controllers
         public async Task<ActionResult<UserResponse>> Login(LoginRequest login)
         {
             this.logger.LogInformation($"Looking for provided username: '{login.Username}'.");
-            var user = await this.context.Users.SingleOrDefaultAsync(x => x.Username == login.Username);
+            var user = await this.context.Users
+                .Include(p => p.Photos)
+                .SingleOrDefaultAsync(x => x.Username == login.Username);
+            
             const string unauthorizedMessage = "The username or password are invalid.";
 
             if (user is null)
@@ -86,8 +90,9 @@ namespace API.Controllers
             
             var userDto = new UserResponse 
             (
-                user.Username,
-                this.tokenService.CreateToken(user)
+                Username: user.Username,
+                Token: this.tokenService.CreateToken(user),
+                PhotoUrl: user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             );
 
             return Ok(userDto);

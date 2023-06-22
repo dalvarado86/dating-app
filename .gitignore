@@ -479,3 +479,6 @@ $RECYCLE.BIN/
 # DataBase
 *.db
 **/*/Migrations
+
+# Production Settings Configuration
+API/appsettings.json
