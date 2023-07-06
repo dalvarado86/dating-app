@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using AutoMapper;
 using API.Data;
 using API.Entities.Requests;
 using API.Entities.Responses;
@@ -16,14 +17,17 @@ namespace API.Controllers
         private readonly ILogger<AccountsController> logger;
         private readonly ITokenService tokenService;
         private readonly DataContext context;
+        private readonly IMapper mapper;
 
         public AccountsController(
             DataContext context, 
             ITokenService tokenService,
+            IMapper mapper,
             ILogger<AccountsController> logger)
         {
-            this.tokenService = tokenService ?? throw new ArgumentNullException(nameof(context));
             this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.tokenService = tokenService ?? throw new ArgumentNullException(nameof(context));
+            this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -37,13 +41,12 @@ namespace API.Controllers
                 return BadRequest($"Username '{register.Username}' is already taken.");
             }
 
+            var user = mapper.Map<AppUser>(register);
+
             using var hmac = new HMACSHA512();
-            var user = new AppUser 
-            {
-                Username = register.Username.ToLower(),
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password)),
-                PasswordSalt = hmac.Key,
-            };
+            user.Username = register.Username.ToLower();
+            user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password));
+            user.PasswordSalt = hmac.Key;
 
             this.context.Users.Add(user);
             await this.context.SaveChangesAsync();
@@ -53,6 +56,7 @@ namespace API.Controllers
             (
                 Username: user.Username,
                 Token: this.tokenService.CreateToken(user),
+                KnownAs: user.KnownAs,
                 PhotoUrl: string.Empty
             );
 
@@ -92,6 +96,7 @@ namespace API.Controllers
             (
                 Username: user.Username,
                 Token: this.tokenService.CreateToken(user),
+                KnownAs: user.KnownAs,
                 PhotoUrl: user.Photos.FirstOrDefault(x => x.IsMain)?.Url
             );
 
