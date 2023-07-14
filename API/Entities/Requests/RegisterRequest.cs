@@ -25,14 +25,5 @@ namespace API.Entities.Requests
 
         [Required]
         public string Country { get; set; }
-
-        [Required]
-        public string Interests { get; set; }
-
-        [Required]
-        public string Introduction { get; set; }
-
-        [Required]
-        public string LookingFor { get; set; }
     }
 }
