@@ -4,5 +4,6 @@ namespace API.Entities.Responses
         string Username, 
         string Token,
         string KnownAs,
-        string? PhotoUrl); 
+        string? PhotoUrl,
+        string Gender); 
 }
