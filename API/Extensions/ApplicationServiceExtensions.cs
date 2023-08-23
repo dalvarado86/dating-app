@@ -20,6 +20,7 @@ namespace API.Extensions
 
             services.AddCors();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IMessageRepository, MessageRepository>();
             services.AddScoped<ILikesRepository, LikesRepository>();
             services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IPhotoService, PhotoService>();
