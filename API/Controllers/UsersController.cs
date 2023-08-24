@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using API.Entities;
 using API.Entities.DTOs;
 using API.Extensions;
@@ -13,25 +12,25 @@ namespace API.Controllers
     [Authorize]
     public class UsersController : BaseApiController
     {
-        private readonly IUserRepository repository;
+        private readonly IUnitOfWork unitOfWork;
         private readonly IPhotoService photoService;
         private readonly IMapper mapper;
         private readonly ILogger<UsersController> logger;
-        
+
         public UsersController(
-            IUserRepository repository, 
+            IUnitOfWork unitOfWork,
             IPhotoService photoService,
-            IMapper mapper, 
+            IMapper mapper,
             ILogger<UsersController> logger)
         {
-            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            this.unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             this.photoService = photoService ?? throw new ArgumentNullException(nameof(photoService));
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
-        public async Task<ActionResult<PaginationList<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
+        public async Task<ActionResult<PaginationList<MemberDto>>> GetUsers([FromQuery] UserParams userParams)
         {
             this.logger.LogInformation("Fetching all users.");
             var currentUser = await this.GetCurrentUserAsync();
@@ -42,7 +41,7 @@ namespace API.Controllers
                 userParams.Gender = currentUser.Gender == "male" ? "male" : "female";
             }
 
-            var members = await this.repository.GetMembersAsync(userParams);
+            var members = await this.unitOfWork.UserRepository.GetMembersAsync(userParams);
             this.logger.LogInformation($"{members.Count()} Users have been retrieved.");
 
             Response.AddPaginationHeader(
@@ -51,7 +50,7 @@ namespace API.Controllers
                     members.PageSize,
                     members.TotalCount,
                     members.TotalPages));
-                    
+
             return Ok(members);
         }
 
@@ -59,8 +58,8 @@ namespace API.Controllers
         public async Task<ActionResult<MemberDto>> GetUserbyName(string username)
         {
             this.logger.LogInformation($"Looking for user with username: {username}.");
-            var member = await this.repository.GetMemberByUsernameAsync(username);
-            
+            var member = await this.unitOfWork.UserRepository.GetMemberByUsernameAsync(username);
+
             if (member is null)
             {
                 this.logger.LogInformation($"User with username {username} does not exist.");
@@ -73,10 +72,10 @@ namespace API.Controllers
 
         [HttpPut]
         public async Task<ActionResult> UpdateUserAsync(MemberUpdateDto memberUpdateDto)
-        {          
-            var user = await GetCurrentUserAsync();           
+        {
+            var user = await GetCurrentUserAsync();
 
-            if (user == null) 
+            if (user == null)
             {
                 return NotFound();
             };
@@ -84,7 +83,7 @@ namespace API.Controllers
             this.logger.LogInformation($"Updating user: {user.UserName}");
             this.mapper.Map(memberUpdateDto, user);
 
-            if (await this.repository.SaveAllAsync())
+            if (await this.unitOfWork.Complete())
             {
                 this.logger.LogInformation($"User has been updated. Username: {user.UserName}, UserId {user.Id}");
                 return NoContent();
@@ -96,9 +95,9 @@ namespace API.Controllers
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var user = await GetCurrentUserAsync();                        
-            
-            if (user == null) 
+            var user = await GetCurrentUserAsync();
+
+            if (user == null)
             {
                 this.logger.LogInformation($"Cannot get the current user.");
                 return NotFound();
@@ -108,7 +107,7 @@ namespace API.Controllers
 
             var result = await this.photoService.AddPhotoAsync(file);
 
-            if (result.Error != null) 
+            if (result.Error != null)
             {
                 this.logger.LogError(result.Error.Message);
                 return BadRequest(result.Error.Message);
@@ -128,12 +127,12 @@ namespace API.Controllers
 
             user.Photos.Add(photo);
 
-            if (await this.repository.SaveAllAsync()) 
+            if (await this.unitOfWork.Complete())
             {
                 this.logger.LogInformation($"User has been updated with new photo: Username: {user.UserName}, FileName: {file.FileName}, Length: {file.Length}");
                 return CreatedAtAction(
-                    nameof(GetUserbyName), 
-                    new {username = user.UserName}, 
+                    nameof(GetUserbyName),
+                    new { username = user.UserName },
                     this.mapper.Map<PhotoDto>(photo));
             }
 
@@ -146,7 +145,7 @@ namespace API.Controllers
             var message = string.Empty;
             var user = await this.GetCurrentUserAsync();
 
-            if (user == null) 
+            if (user == null)
             {
                 this.logger.LogInformation($"Cannot get the current user.");
                 return NotFound();
@@ -154,13 +153,13 @@ namespace API.Controllers
 
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if (photo == null) 
+            if (photo == null)
             {
                 this.logger.LogInformation($"Photo doesn't exist: PhotoId: {photoId}");
                 return NotFound();
             }
 
-            if (photo.IsMain) 
+            if (photo.IsMain)
             {
                 message = "This is already your main photo";
                 this.logger.LogWarning(message);
@@ -168,8 +167,8 @@ namespace API.Controllers
             }
 
             var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
-            
-            if (currentMain != null) 
+
+            if (currentMain != null)
             {
                 this.logger.LogInformation($"Setting photo as main.");
                 currentMain.IsMain = false;
@@ -177,7 +176,7 @@ namespace API.Controllers
 
             photo.IsMain = true;
 
-            if (await this.repository.SaveAllAsync()) 
+            if (await this.unitOfWork.Complete())
             {
                 this.logger.LogInformation($"Main photo has been set for user: Username: {user.UserName}, PhotoId: {photoId}");
                 return NoContent();
@@ -194,7 +193,7 @@ namespace API.Controllers
             var message = string.Empty;
             var user = await this.GetCurrentUserAsync();
 
-            if (user == null) 
+            if (user == null)
             {
                 this.logger.LogInformation($"Cannot get the current user.");
                 return NotFound();
@@ -202,13 +201,13 @@ namespace API.Controllers
 
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if (photo == null) 
+            if (photo == null)
             {
                 this.logger.LogInformation($"Photo doesn't exist: PhotoId: {photoId}");
                 return NotFound();
             }
 
-            if (photo.IsMain) 
+            if (photo.IsMain)
             {
                 message = "Cannot delete main photo.";
                 this.logger.LogWarning(message);
@@ -219,8 +218,8 @@ namespace API.Controllers
             {
                 this.logger.LogInformation($"Removing photo from third party service: PhotoId: {photoId}, PublicId: {photo.PublicId}");
                 var result = await this.photoService.DeletePhotoAsync(photo.PublicId);
-                
-                if (result.Error != null) 
+
+                if (result.Error != null)
                 {
                     this.logger.LogError(result.Error.Message);
                     return BadRequest(result.Error.Message);
@@ -230,7 +229,7 @@ namespace API.Controllers
             this.logger.LogInformation($"Removing photo from user: PhotoId: {photoId}.");
             user.Photos.Remove(photo);
 
-            if (await this.repository.SaveAllAsync()) 
+            if (await this.unitOfWork.Complete())
             {
                 this.logger.LogInformation($"Photo has been deleted: PhotoId: {photoId}.");
                 return Ok();
@@ -245,9 +244,9 @@ namespace API.Controllers
         {
             this.logger.LogInformation($"Trying to get the current username.");
             var username = User.GetUsername();
-            
+
             this.logger.LogInformation($"Looking for the current user with username: {username}.");
-            var user = await this.repository.GetUserByUsernameAsync(username);
+            var user = await this.unitOfWork.UserRepository.GetUserByUsernameAsync(username);
 
             this.logger.LogInformation($"User has been retrieved. Username: {username}, UserId: {user.Id}");
             return user;

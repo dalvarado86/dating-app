@@ -21,8 +21,8 @@ namespace API.Data
 
         public async Task<MemberDto> GetMemberByUsernameAsync(string username)
         {
-            ArgumentException.ThrowIfNullOrEmpty(username);
-            
+            ArgumentException.ThrowIfNullOrEmpty(username, nameof(username));
+
             return await context.Users
                 .Where(x => x.UserName == username)
                 .ProjectTo<MemberDto>(this.mapper.ConfigurationProvider)
@@ -31,21 +31,23 @@ namespace API.Data
 
         public async Task<PaginationList<MemberDto>> GetMembersAsync(UserParams userParams)
         {
+            ArgumentNullException.ThrowIfNull(userParams, nameof(userParams));
+
             var query = context.Users.AsQueryable();
 
             query = query.Where(u => u.UserName != userParams.CurrentUsername);
             query = query.Where(u => u.Gender == userParams.Gender);
 
             var minDateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MaxAge - 1));
-            var maxDateOfBirth  = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MinAge));
+            var maxDateOfBirth = DateOnly.FromDateTime(DateTime.Today.AddYears(-userParams.MinAge));
 
-            query = query.Where(u => u.DateOfBirth >= minDateOfBirth 
+            query = query.Where(u => u.DateOfBirth >= minDateOfBirth
                                 && u.DateOfBirth <= maxDateOfBirth);
 
             query = userParams.OrderBy switch
             {
                 "created" => query.OrderByDescending(u => u.Created),
-                        _ => query.OrderByDescending(u => u.LastActive)
+                _ => query.OrderByDescending(u => u.LastActive)
             };
 
             return await PaginationList<MemberDto>.CreateAsync(
@@ -63,7 +65,7 @@ namespace API.Data
         public async Task<AppUser> GetUserByUsernameAsync(string username)
         {
             ArgumentException.ThrowIfNullOrEmpty(username);
-            
+
             return await this.context.Users
                 .Include(p => p.Photos)
                 .SingleOrDefaultAsync(x => x.UserName == username);
@@ -76,13 +78,11 @@ namespace API.Data
                 .ToListAsync();
         }
 
-        public async Task<bool> SaveAllAsync()
-        {
-            return await this.context.SaveChangesAsync() > 0;
-        }
 
         public void Update(AppUser user)
         {
+            ArgumentNullException.ThrowIfNull(user, nameof(user));
+
             this.context.Entry(user).State = EntityState.Modified;
         }
     }
