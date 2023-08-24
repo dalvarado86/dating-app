@@ -25,7 +25,7 @@ namespace API.Data
         public async Task<PaginationList<LikeDto>> GetUserLikesAsync(LikesParams likesParams)
         {
             var users = this.dbContext.Users
-                .OrderBy(u => u.Username)
+                .OrderBy(u => u.UserName)
                 .AsQueryable();
             
             var likes = this.dbContext.Likes
@@ -44,7 +44,7 @@ namespace API.Data
             }
 
             var likedUsers = users.Select(user => new LikeDto {
-                UserName = user.Username,
+                UserName = user.UserName,
                 KnownAs = user.KnownAs,
                 Age = user.DateOfBirth.CalcuateAge(),
                 PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain).Url,

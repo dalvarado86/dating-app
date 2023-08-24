@@ -1,6 +1,6 @@
 [
     {
-      "Username": "Juliet",
+      "UserName": "Juliet",
       "Gender": "female",
       "DateOfBirth": "1977-09-20",
       "KnownAs": "Juliet",
@@ -19,7 +19,7 @@
       ]
     },
     {
-      "Username": "Mable",
+      "UserName": "Mable",
       "Gender": "female",
       "DateOfBirth": "1991-10-27",
       "KnownAs": "Mable",
@@ -38,7 +38,7 @@
       ]
     },
     {
-      "Username": "Diana",
+      "UserName": "Diana",
       "Gender": "female",
       "DateOfBirth": "1980-08-11",
       "KnownAs": "Diana",
@@ -57,7 +57,7 @@
       ]
     },
     {
-      "Username": "Geneva",
+      "UserName": "Geneva",
       "Gender": "female",
       "DateOfBirth": "1957-08-20",
       "KnownAs": "Geneva",
@@ -76,7 +76,7 @@
       ]
     },
     {
-      "Username": "Latonya",
+      "UserName": "Latonya",
       "Gender": "female",
       "DateOfBirth": "1964-01-08",
       "KnownAs": "Latonya",
@@ -95,7 +95,7 @@
       ]
     },
     {
-      "Username": "Whitney",
+      "UserName": "Whitney",
       "Gender": "male",
       "DateOfBirth": "1999-01-17",
       "KnownAs": "Whitney",
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "Username": "Dunlap",
+      "UserName": "Dunlap",
       "Gender": "male",
       "DateOfBirth": "1993-08-16",
       "KnownAs": "Dunlap",
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "Username": "Nolan",
+      "UserName": "Nolan",
       "Gender": "male",
       "DateOfBirth": "1977-04-07",
       "KnownAs": "Nolan",
@@ -152,7 +152,7 @@
       ]
     },
     {
-      "Username": "Townsend",
+      "UserName": "Townsend",
       "Gender": "male",
       "DateOfBirth": "1989-08-22",
       "KnownAs": "Townsend",
@@ -171,7 +171,7 @@
       ]
     },
     {
-      "Username": "Montgomery",
+      "UserName": "Montgomery",
       "Gender": "male",
       "DateOfBirth": "1963-07-14",
       "KnownAs": "Montgomery",

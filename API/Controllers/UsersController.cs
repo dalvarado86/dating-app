@@ -35,7 +35,7 @@ namespace API.Controllers
         {
             this.logger.LogInformation("Fetching all users.");
             var currentUser = await this.GetCurrentUserAsync();
-            userParams.CurrentUsername = currentUser.Username;
+            userParams.CurrentUsername = currentUser.UserName;
 
             if (string.IsNullOrEmpty(userParams.Gender))
             {
@@ -81,12 +81,12 @@ namespace API.Controllers
                 return NotFound();
             };
 
-            this.logger.LogInformation($"Updating user: {user.Username}");
+            this.logger.LogInformation($"Updating user: {user.UserName}");
             this.mapper.Map(memberUpdateDto, user);
 
             if (await this.repository.SaveAllAsync())
             {
-                this.logger.LogInformation($"User has been updated. Username: {user.Username}, UserId {user.Id}");
+                this.logger.LogInformation($"User has been updated. Username: {user.UserName}, UserId {user.Id}");
                 return NoContent();
             }
 
@@ -104,7 +104,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            this.logger.LogInformation($"Adding new photo for user: Username: {user.Username}, FileName: {file.FileName}, Length: {file.Length}");
+            this.logger.LogInformation($"Adding new photo for user: Username: {user.UserName}, FileName: {file.FileName}, Length: {file.Length}");
 
             var result = await this.photoService.AddPhotoAsync(file);
 
@@ -130,10 +130,10 @@ namespace API.Controllers
 
             if (await this.repository.SaveAllAsync()) 
             {
-                this.logger.LogInformation($"User has been updated with new photo: Username: {user.Username}, FileName: {file.FileName}, Length: {file.Length}");
+                this.logger.LogInformation($"User has been updated with new photo: Username: {user.UserName}, FileName: {file.FileName}, Length: {file.Length}");
                 return CreatedAtAction(
                     nameof(GetUserbyName), 
-                    new {username = user.Username}, 
+                    new {username = user.UserName}, 
                     this.mapper.Map<PhotoDto>(photo));
             }
 
@@ -179,7 +179,7 @@ namespace API.Controllers
 
             if (await this.repository.SaveAllAsync()) 
             {
-                this.logger.LogInformation($"Main photo has been set for user: Username: {user.Username}, PhotoId: {photoId}");
+                this.logger.LogInformation($"Main photo has been set for user: Username: {user.UserName}, PhotoId: {photoId}");
                 return NoContent();
             }
 

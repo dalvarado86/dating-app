@@ -9,7 +9,8 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
-import { TimeagoModule } from "ngx-timeago";
+import { TimeagoModule } from 'ngx-timeago';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 @NgModule({
   declarations: [],
@@ -17,16 +18,17 @@ import { TimeagoModule } from "ngx-timeago";
     CommonModule,
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
+    ModalModule.forRoot(),
     ToastrModule.forRoot({
-      positionClass: 'toast-bottom-right'
+      positionClass: 'toast-bottom-right',
     }),
     NgxGalleryModule,
-    NgxSpinnerModule.forRoot( { type: 'line-scale-party'}),
+    NgxSpinnerModule.forRoot({ type: 'line-scale-party' }),
     FileUploadModule,
     BsDatepickerModule.forRoot(),
     PaginationModule.forRoot(),
     ButtonsModule.forRoot(),
-    TimeagoModule.forRoot()
+    TimeagoModule.forRoot(),
   ],
   exports: [
     BsDropdownModule,
@@ -38,7 +40,8 @@ import { TimeagoModule } from "ngx-timeago";
     BsDatepickerModule,
     PaginationModule,
     ButtonsModule,
-    TimeagoModule
-  ]
+    TimeagoModule,
+    ModalModule,
+  ],
 })
-export class SharedModule { }
+export class SharedModule {}

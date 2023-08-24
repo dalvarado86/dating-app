@@ -32,7 +32,7 @@ namespace API.Controllers
                 return NotFound();
             }
 
-            if (sourceUser.Username == username) 
+            if (sourceUser.UserName == username) 
             {
                 return BadRequest("Users cannot liked themselves.");
             }
