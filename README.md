@@ -12,14 +12,32 @@ Based on of Neils Cummings's course on Udemy [Build an app with ASPNET Core and 
 ## Technologies
 
 ### ASP .NET CORE 7
+* REST API
 * Entity Framework Core
+* Paging and Filtering
 * Automapper
 * ASP .NET Core Identity
-* Cloudinary API
+* JWT Tokens
 * SignalR
+* Repository Pattern
+* Options Pattern
+* Unit Of Work Pattern
 
 ### Angular 14
+* Template forms
+* Reactive forms
+* Reusable form controls
+* Input validations
+* Observables
+* Component communication (parent <-> child)
+* Directives
+* Route guards
+* Routing
+* Route resolvers
+* Interceptors
+* Bootstrap theme
 * Signalr
+* Cache
 
 ## Getting Started
 

@@ -19,11 +19,27 @@ namespace API.Data
             this.mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        public async Task<MemberDto> GetMemberAsync(string username, bool isCurrentUser)
+        {
+            var query = this.context.Users
+                .Where(x => x.UserName == username)
+                .ProjectTo<MemberDto>(this.mapper.ConfigurationProvider)
+                .AsQueryable();
+
+            if (isCurrentUser) 
+            {
+                query = query.IgnoreQueryFilters();
+            }
+            
+            return await query.FirstOrDefaultAsync();
+        }
+
+
         public async Task<MemberDto> GetMemberByUsernameAsync(string username)
         {
             ArgumentException.ThrowIfNullOrEmpty(username, nameof(username));
 
-            return await context.Users
+            return await this.context.Users
                 .Where(x => x.UserName == username)
                 .ProjectTo<MemberDto>(this.mapper.ConfigurationProvider)
                 .SingleOrDefaultAsync();
@@ -33,7 +49,7 @@ namespace API.Data
         {
             ArgumentNullException.ThrowIfNull(userParams, nameof(userParams));
 
-            var query = context.Users.AsQueryable();
+            var query = this.context.Users.AsQueryable();
 
             query = query.Where(u => u.UserName != userParams.CurrentUsername);
             query = query.Where(u => u.Gender == userParams.Gender);
@@ -61,6 +77,16 @@ namespace API.Data
         {
             return await this.context.Users.FindAsync(id);
         }
+
+        public async Task<AppUser> GetUserByPhotoIdAsync(int photoId)
+        {
+            return await this.context.Users
+                .Include(p => p.Photos)
+                .IgnoreQueryFilters()
+                .Where(p => p.Photos.Any(p => p.Id == photoId))
+                .FirstOrDefaultAsync();
+        }
+
 
         public async Task<AppUser> GetUserByUsernameAsync(string username)
         {

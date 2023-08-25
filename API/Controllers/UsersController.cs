@@ -58,7 +58,11 @@ namespace API.Controllers
         public async Task<ActionResult<MemberDto>> GetUserbyName(string username)
         {
             this.logger.LogInformation($"Looking for user with username: {username}.");
-            var member = await this.unitOfWork.UserRepository.GetMemberByUsernameAsync(username);
+
+            var currentUsername = User.GetUsername();
+
+            var member = await this.unitOfWork.UserRepository
+                .GetMemberAsync(username, isCurrentUser: currentUsername == username);
 
             if (member is null)
             {
@@ -78,7 +82,7 @@ namespace API.Controllers
             if (user == null)
             {
                 return NotFound();
-            };
+            }
 
             this.logger.LogInformation($"Updating user: {user.UserName}");
             this.mapper.Map(memberUpdateDto, user);
@@ -95,48 +99,37 @@ namespace API.Controllers
         [HttpPost("add-photo")]
         public async Task<ActionResult<PhotoDto>> AddPhoto(IFormFile file)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await this.GetCurrentUserAsync();
 
             if (user == null)
             {
-                this.logger.LogInformation($"Cannot get the current user.");
                 return NotFound();
             }
-
-            this.logger.LogInformation($"Adding new photo for user: Username: {user.UserName}, FileName: {file.FileName}, Length: {file.Length}");
 
             var result = await this.photoService.AddPhotoAsync(file);
 
             if (result.Error != null)
             {
-                this.logger.LogError(result.Error.Message);
                 return BadRequest(result.Error.Message);
             }
 
             var photo = new Photo
             {
                 Url = result.SecureUrl.AbsoluteUri,
-                PublicId = result.PublicId,
+                PublicId = result.PublicId
             };
-
-            if (user.Photos.Count == 0)
-            {
-                this.logger.LogInformation($"Setting photo as main.");
-                photo.IsMain = true;
-            }
 
             user.Photos.Add(photo);
 
             if (await this.unitOfWork.Complete())
             {
-                this.logger.LogInformation($"User has been updated with new photo: Username: {user.UserName}, FileName: {file.FileName}, Length: {file.Length}");
                 return CreatedAtAction(
-                    nameof(GetUserbyName),
-                    new { username = user.UserName },
+                    nameof(GetUserbyName), 
+                    new {username = user.UserName}, 
                     this.mapper.Map<PhotoDto>(photo));
             }
 
-            return BadRequest("Failed when adding photo.");
+            return BadRequest("Problem addding photo");
         }
 
         [HttpPut("set-main-photo/{photoId}")]
@@ -199,7 +192,8 @@ namespace API.Controllers
                 return NotFound();
             };
 
-            var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
+            var photo = await this.unitOfWork.PhotoRepository
+                .GetPhotoByIdAsync(photoId);
 
             if (photo == null)
             {
