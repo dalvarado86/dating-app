@@ -48,3 +48,8 @@
   .nav-tabs {
       --bs-nav-tabs-border-width: 0px;
   }
+
+  .gallery {
+    height: 500px;
+    background-color: white;
+  }

@@ -1,13 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {
-  NgxGalleryAnimation,
-  NgxGalleryImage,
-  NgxGalleryOptions,
-  NgxGalleryModule,
-} from '@kolkov/ngx-gallery';
 import { TimeagoModule } from 'ngx-timeago';
 import { take } from 'rxjs';
+import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
 import { TabDirective, TabsModule, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 import { CommonModule } from '@angular/common';
@@ -23,22 +18,15 @@ import { User } from 'src/app/models/user';
   standalone: true,
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css'],
-  imports: [
-    CommonModule,
-    TabsModule,
-    NgxGalleryModule,
-    TimeagoModule,
-    MemberMessagesComponent,
-  ],
+  imports: [CommonModule, TabsModule, GalleryModule, TimeagoModule, MemberMessagesComponent]
 })
 export class MemberDetailComponent implements OnInit, OnDestroy {
   @ViewChild('memberTabs', { static: true }) memberTabs?: TabsetComponent;
   member: Member = {} as Member;
-  galleryOptions: NgxGalleryOptions[] = [];
-  galleryImages: NgxGalleryImage[] = [];
   activeTab?: TabDirective;
   messages: Message[] = [];
   user?: User;
+  images: GalleryItem[] = [];
 
   constructor(
     public presenceService: PresenceService,
@@ -64,18 +52,7 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       },
     });
 
-    this.getImages();
-
-    this.galleryOptions = [
-      {
-        width: '500px',
-        height: '500px',
-        imagePercent: 100,
-        thumbnailsColumns: 4,
-        imageAnimation: NgxGalleryAnimation.Slide,
-        preview: false,
-      },
-    ];
+    this.getImages()
   }
 
   ngOnDestroy(): void {
@@ -84,20 +61,12 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
 
   getImages() {
     if (!this.member) {
-      return [];
+      return;
     }
-
-    const imageUrls = [];
 
     for (const photo of this.member.photos) {
-      imageUrls.push({
-        small: photo.url,
-        medium: photo.url,
-        big: photo.url,
-      });
+      this.images.push(new ImageItem({ src: photo.url, thumb: photo.url }));
     }
-
-    return imageUrls;
   }
 
   selectTab(heading: string) {
