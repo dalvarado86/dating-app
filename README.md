@@ -6,7 +6,7 @@ Based on of Neils Cummings's course on Udemy [Build an app with ASPNET Core and 
 ## Prerequisites
 * [.NET Core SDK](https://dotnet.microsoft.com/download) (7.0.2 or later)
 * [Node.js](https://nodejs.org/en/download/current/) (18.15.0 or later)
-* [Angular](https://angular.io/guide/setup-local) (14.2.0 or later)
+* [Angular](https://angular.io/guide/setup-local) (15.0.0)
 * [Cloudinary](https://cloudinary.com/) (Open a free account)
 
 ## Technologies
