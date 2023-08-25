@@ -9,11 +9,8 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const toastr = inject(ToastrService);
 
   return accountService.currentUser$.pipe(
-    map((user) => {
-      if (!user) {
-        return false;
-      }
-      
+    map(user => {
+      if (!user) return false;
       if (user.roles.includes('Admin') || user.roles.includes('Moderator')) {
         return true;
       } else {
@@ -21,5 +18,5 @@ export const adminGuard: CanActivateFn = (route, state) => {
         return false;
       }
     })
-  );
+  )
 };

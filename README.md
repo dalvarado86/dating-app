@@ -6,7 +6,7 @@ Based on of Neils Cummings's course on Udemy [Build an app with ASPNET Core and 
 ## Prerequisites
 * [.NET Core SDK](https://dotnet.microsoft.com/download) (7.0.2 or later)
 * [Node.js](https://nodejs.org/en/download/current/) (18.15.0 or later)
-* [Angular](https://angular.io/guide/setup-local) (15.0.0)
+* [Angular](https://angular.io/guide/setup-local) (16.2.2)
 * [Cloudinary](https://cloudinary.com/) (Open a free account)
 
 ## Technologies
@@ -74,6 +74,6 @@ This layer is a Web API based on ASP.NET Core 7. Contains fundamental examples t
 
 ### Clien-App
 
-This is a client app based on Angular with typescript, it represent the front-end of this application. A basic hands-on with Angular.
+This is a client app based on Angular with typescript, it represent the front-end of this application. A basic hands-on.
 
 Have fun!
