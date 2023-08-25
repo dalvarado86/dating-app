@@ -23,7 +23,7 @@ Based on of Neils Cummings's course on Udemy [Build an app with ASPNET Core and 
 * Options Pattern
 * Unit Of Work Pattern
 
-### Angular 14
+### Angular 16
 * Template forms
 * Reactive forms
 * Reusable form controls
